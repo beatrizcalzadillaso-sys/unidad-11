@@ -160,6 +160,9 @@ número real que tome el valor del salario del empleado dividido entre el númer
 subordinados que tenga. En caso de que el empleado no tenga subordinados, la función deberá
 devolver el valor -1.*/
 
+delimiter //
+
+
 /*12. Crea un procedimiento llamado IncrementarComisión que reciba el número de un empleado y
 que en función del número de subordinados de ese empleado se le incremente la comisión del
 siguiente modo: si el empleado no tiene subordinados, se le incrementará la comisión en 10 €; si
