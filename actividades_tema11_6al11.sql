@@ -67,8 +67,14 @@ select count(NumEmp)
 Delimiter //
 create function Employee(jefe int) returns int reads sql data
 begin
-
+declare cantEmp int;
+select count(NumEmp) into cantEmp
+	from empleado
+    where NumEmpJefe = jefe;
+return cantEmp;
 end;//
+
+select Employee(4) CantidadEmpleados;
 
 /*9. Crea un procedimiento llamado ModificarSalariosDep que reciba el número de un departamento
 y un número real con dos decimales. El procedimiento, en primer lugar, obtendrá el número de
@@ -79,12 +85,75 @@ los empleados del departamento cuyo número se ha pasado como primer parámetro 
 porcentaje recibido como segundo parámetro, después de lo cual se mostrará el mensaje “Se ha
 modificado el salario de todos los empleados del dpto. no xx en un yyy,yy%”.  */
 
+select count(NumDep) CantidadEmpDep
+from empleado
+where NumDep = 3;
+
+select Salario
+from empleado
+where NumDep = 3;
+
+update empleado2
+set Salario= (Salario*0.025)+Salario 
+where NumDep= 1; 
+
+Delimiter //
+create procedure ModificarSalariosDep(departamento int, aumento numeric(6,2)) 
+begin
+declare CantidadEmpDep int;
+select count(NumDep) into CantidadEmpDep
+	from empleado
+	where NumDep = departamento;
+    
+if CantidadEmpDep = 0 then
+	select concat('El departamento numero ', departamento, ' no tiene empleados') MensajeSinEmp;
+else 
+	update empleado2
+	set Salario= (Salario*aumento)+Salario 
+	where NumDep= departamento; 
+	select concat('Se ha modificado el salario de todos los empleados del departamento ', departamento, ' en un ', aumento, ' %') MensajeConEmp;
+end if;
+end; //
+
+call ModificarSalariosDep(1, 5.25); //
+
 /*10. Crea un procedimiento llamado AsignarComision que reciba un número de empleado y
 compruebe su salario en la tabla Empleado. Si el salario del empleado es menor que 1500 €, se le
 debe asignar una comisión que será el 5% del salario; en caso de que su salario sea superior o
 igual a 1500 €, pero inferior a 2500 €, se le deberá asignar una comisión igual al 2,5% del salario;
 en caso de que cobre 2500 € o más, se le pondrá a 0 € la comisión. Muestra un mensaje como el
 siguiente: “Al empleado no XXXX se le ha asignado una comisión de YY.YY €”.*/
+
+delimiter //
+create procedure AsignarComision(NumeroEmp int)
+begin
+declare SalarioEmp decimal(6,2);
+declare ComisionFinal decimal(6,2);
+select Salario into SalarioEmp
+	from empleado2
+	where NumEmp = NumeroEmp;
+if SalarioEmp < 1500 then
+	update empleado2
+    set Comision = salario*0.05
+    where NumEmp = NumeroEmp;
+elseif 1500 <= SalarioEmp < 2500 then
+	update empleado2
+    set Comision = salario*0.025
+    where NumEmp = NumeroEmp;
+else
+	update empleado2
+    set Comision = 0
+    where NumEmp = NumeroEmp;
+end if;
+select comision into ComisionFinal
+	from empleado2
+	where NumEmp = NumeroEmp;
+
+select concat ('Al empleado numero ', NumeroEmp, ' se le ha asignado una comision de ',ComisionFinal) mensaje;
+end; //
+
+call AsignarComision(11); //
+
 
 /*11. Crea una función llamada SalarioJefe que reciba el nombre de un empleado y que devuelva un
 número real que tome el valor del salario del empleado dividido entre el número de empleados

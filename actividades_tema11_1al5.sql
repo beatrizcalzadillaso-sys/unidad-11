@@ -13,7 +13,7 @@ values (referencia, fecha);
 select concat('Se ha añadido un pedido con referencia', referencia) mensaje;
 end;//
 
-call addPedido('P0078', current_date());
+call addPedido('P0080', current_date());
 
 /*2. Escribe un procedimiento que muestre en pantalla la descripción y el precio del artículo más
 barato de la base de datos.*/
